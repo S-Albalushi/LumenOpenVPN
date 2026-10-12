@@ -33,7 +33,7 @@ jobs:
       - name: Build APK
         run: |
           chmod +x ./gradlew
-          ./gradlew :main:assembleDebug --no-daemon
+          ./gradlew :main:assembleUiOvpn23Debug --no-daemon
 
       - name: Release APK
         if: success()
@@ -41,7 +41,7 @@ jobs:
         with:
           tag_name: openvpn-build-${{ github.run_number }}
           name: "LumenOpenVPN build ${{ github.run_number }}"
-          files: main/build/outputs/apk/debug/*.apk
+          files: main/build/outputs/apk/uiOvpn23/debug/*.apk
           prerelease: true
           generate_release_notes: false
         env:
