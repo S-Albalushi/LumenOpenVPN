@@ -1,0 +1,48 @@
+name: Build LumenOpenVPN
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: '17'
+
+      - name: Setup SDK
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
+            "platforms;android-37" \
+            "build-tools;34.0.0" \
+            "platform-tools" \
+            "cmake;3.22.1" \
+            "ndk;30.0.14904198" > /dev/null 2>&1 || true
+
+      - name: Build APK
+        run: |
+          chmod +x ./gradlew
+          ./gradlew :main:assembleDebug --no-daemon
+
+      - name: Release APK
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: openvpn-build-${{ github.run_number }}
+          name: "LumenOpenVPN build ${{ github.run_number }}"
+          files: main/build/outputs/apk/debug/*.apk
+          prerelease: true
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
