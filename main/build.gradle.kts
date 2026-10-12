@@ -33,6 +33,7 @@ android {
     ndkVersion = "30.0.14904198"
 
     defaultConfig {
+        applicationId = "net.kramb.lumen.openvpn"
         minSdk = 23
         targetSdk = 37
         //targetSdkPreview = "UpsideDownCake"
